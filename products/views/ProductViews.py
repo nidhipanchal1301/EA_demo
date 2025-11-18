@@ -30,8 +30,6 @@ class ProductListView(generics.ListAPIView):
     ordering_fields = ('created_at', 'product_sku_name')
     ordering = ('-created_at',)
 
-   
-
 
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
