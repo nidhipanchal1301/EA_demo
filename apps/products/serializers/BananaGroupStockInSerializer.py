@@ -38,9 +38,8 @@ class BananaGroupStockInCreateSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class BananaGroupStockInDeleteSerializer(serializers.ModelSerializer):
-
+class BananaGroupStockInDeactivateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BananaGroupStockIn
-        fields = ("id",)     
+        fields = ("id", "is_active")
         read_only_fields = ("id",)

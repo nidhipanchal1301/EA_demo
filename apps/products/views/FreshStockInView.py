@@ -1,5 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+
 from apps.products.models import FreshStockIn, Product
 from apps.products.serializers.FreshStockInSerializer import FreshStockInCreateSerializer, FreshStockInListSerializer
 
@@ -29,14 +30,18 @@ class FreshStockInCreateView(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FreshStockInDeleteView(generics.DestroyAPIView):
+class FreshStockInDeactivateView(generics.GenericAPIView):
+    serializer_class = FreshStockInListSerializer
     queryset = FreshStockIn.objects.all()
 
-    def delete(self, request, pk, *args, **kwargs):
+    def post(self, request, pk, *args, **kwargs):
         try:
-            fresh_stock = self.get_object()
-            fresh_stock.delete()
-            return Response({"message": "Stock deleted successfully"}, status=204)
+            stock = self.get_queryset().get(pk=pk)
+            if not stock.is_active:
+                return Response({"message": "Already deactivated"}, status=status.HTTP_200_OK)
+            stock.is_active = False
+            stock.save()
+            return Response({"message": "Stock deactivated successfully"}, status=status.HTTP_200_OK)
         except FreshStockIn.DoesNotExist:
-            return Response({"error": "Not found"}, status=404)
+            return Response({"error": "Stock not found"}, status=status.HTTP_404_NOT_FOUND)
 

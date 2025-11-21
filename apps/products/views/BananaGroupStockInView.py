@@ -6,7 +6,7 @@ from apps.products.models import BananaGroupStockIn
 from apps.products.serializers.BananaGroupStockInSerializer import (
     BananaGroupStockInListSerializer,
     BananaGroupStockInCreateSerializer,
-    BananaGroupStockInDeleteSerializer,
+    BananaGroupStockInDeactivateSerializer,
 )
 
 
@@ -35,12 +35,18 @@ class BananaGroupStockInCreateView(generics.GenericAPIView):
 
 
 
-class BananaGroupStockInDeleteView(generics.GenericAPIView):
-    serializer_class = BananaGroupStockInDeleteSerializer
-    lookup_field = "pk"
+class BananaGroupStockInDeactivateView(generics.GenericAPIView):
+    serializer_class = BananaGroupStockInDeactivateSerializer
     queryset = BananaGroupStockIn.objects.all()
 
-    def delete(self, request, pk):
-        obj = self.get_object()
-        obj.delete()
-        return Response({"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            obj = self.get_queryset().get(pk=pk)
+            obj.is_active = False
+            obj.save()
+            return Response({"message": "Stock deactivated successfully"}, status=200)
+        except BananaGroupStockIn.DoesNotExist:
+            return Response({"error": "Not found"}, status=404)
+
+
+    

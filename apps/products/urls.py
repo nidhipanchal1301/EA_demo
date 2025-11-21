@@ -5,13 +5,13 @@ from apps.products.views.ProductViews import *
 from apps.products.views.FreshStockInView import (
      FreshStockInListView, 
      FreshStockInCreateView, 
-     FreshStockInDeleteView,
+     FreshStockInDeactivateView,
 )
 
 from apps.products.views.BananaGroupStockInView import (
     BananaGroupStockInListView,
     BananaGroupStockInCreateView,
-    BananaGroupStockInDeleteView,
+    BananaGroupStockInDeactivateView,
 )
 
 
@@ -27,11 +27,13 @@ urlpatterns = [
      # Fresh Stock-In
     path("fresh-stock", FreshStockInListView.as_view()),
     path("fresh-stock/create", FreshStockInCreateView.as_view()),
-    path("fresh-stock/<int:pk>/delete", FreshStockInDeleteView.as_view()),
+    path("fresh-stock/<int:pk>/deactivate", FreshStockInDeactivateView.as_view()),
+
 
 
     # Banana Group Stock-In
     path("banana-stock", BananaGroupStockInListView.as_view()),
     path("banana-stock/create", BananaGroupStockInCreateView.as_view()),
-    path("banana-stock/<int:pk>/delete", BananaGroupStockInDeleteView.as_view()),
+    path("banana-stock/<int:pk>/deactivate", BananaGroupStockInDeactivateView.as_view()),
+    
 ]
