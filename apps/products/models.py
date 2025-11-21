@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.core.exceptions import ValidationError
 
 
@@ -59,7 +60,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_sku_name
-
 
 
 # FreshStockIn

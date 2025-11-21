@@ -17,6 +17,7 @@ from apps.products.views.BananaGroupStockInView import (
 
 
 urlpatterns = [
+    # Produts
     path('', ProductListView.as_view(), name='product-list'),
     path('create', ProductCreateView.as_view(), name='product-create'),
     path('<int:pk>', ProductDetailView.as_view(), name='product-detail'),
