@@ -3,10 +3,26 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.env
+
+# Virtual Environment
+.env
+venv/
 
 # Django
-/media/
+*/migrations/
+!*/migrations/__init__.py
 
-# Virtual environment
-venv/
+# Media
+media/
+uploads/
+
+# Static
+staticfiles/
+static/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

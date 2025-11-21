@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'products',
+    'apps.products',
     'debug_toolbar',
 
 ]
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'EA_demo.urls'
+ROOT_URLCONF = 'EA_DEMO.urls'
 
 TEMPLATES = [
     {
@@ -71,18 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'EA_demo.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+WSGI_APPLICATION = 'EA_DEMO.wsgi.application'
 
 
 DATABASES = {
@@ -159,6 +148,8 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ]
 }
+
+
 
 INTERNAL_IPS = [
     "127.0.0.1", 
