@@ -29,17 +29,12 @@ class BananaGroupStockInCreateSerializer(serializers.ModelSerializer):
             'min_humidity', 'max_humidity')
 
     def validate(self, attrs):
-        if attrs.get("inward_qty", 0) < 0:
-            raise serializers.ValidationError({"inward_qty": "Must be non-negative."})
+        if attrs.get("quantity", 0) < 0:
+            raise serializers.ValidationError({"quantity": "Must be non-negative."})
 
-        if attrs.get("total", 0) < 0:
-            raise serializers.ValidationError({"total": "Must be non-negative."})
+        if attrs.get("inward_quantity", 0) < 0:
+            raise serializers.ValidationError({"inward_quantity": "Must be non-negative."})
 
         return attrs
 
 
-class BananaGroupStockInDeactivateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BananaGroupStockIn
-        fields = ("id", "is_active")
-        read_only_fields = ("id",)

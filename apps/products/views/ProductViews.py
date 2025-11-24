@@ -23,7 +23,7 @@ class ProductListView(generics.ListAPIView):
     ordering = ('-created_at',)
 
     ordering_fields = ('created_at', 'product_sku_name')
-    ordering = ('-created_at',)
+    # ordering = ('-created_at',)
 
 
 class ProductDetailView(generics.RetrieveAPIView):

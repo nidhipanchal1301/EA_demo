@@ -6,7 +6,6 @@ from apps.products.models import BananaGroupStockIn
 from apps.products.serializers.BananaGroupStockInSerializer import (
     BananaGroupStockInListSerializer,
     BananaGroupStockInCreateSerializer,
-    BananaGroupStockInDeactivateSerializer,
 )
 
 
@@ -25,28 +24,28 @@ class BananaGroupStockInListView(generics.GenericAPIView):
 
 class BananaGroupStockInCreateView(generics.GenericAPIView):
     serializer_class = BananaGroupStockInCreateSerializer
+    queryset = BananaGroupStockIn.objects.all()
 
     def post(self, request):
+        if request.data.get("action") == "deactivate":
+            stock_id = request.data.get("id")
+            try:
+                obj = self.get_queryset().get(pk=stock_id)
+                obj.is_active = False
+                obj.save()
+                return Response({"message": "Stock deactivated successfully"}, status=200)
+            except BananaGroupStockIn.DoesNotExist:
+                return Response({"error": "Stock not found"}, status=404)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=201)
+
+        return Response(serializer.errors, status=400)
 
 
 
-class BananaGroupStockInDeactivateView(generics.GenericAPIView):
-    serializer_class = BananaGroupStockInDeactivateSerializer
-    queryset = BananaGroupStockIn.objects.all()
 
-    def post(self, request, pk, *args, **kwargs):
-        try:
-            obj = self.get_queryset().get(pk=pk)
-            obj.is_active = False
-            obj.save()
-            return Response({"message": "Stock deactivated successfully"}, status=200)
-        except BananaGroupStockIn.DoesNotExist:
-            return Response({"error": "Not found"}, status=404)
 
 
     

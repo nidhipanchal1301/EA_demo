@@ -19,13 +19,7 @@ class FreshStockInCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FreshStockIn
         fields = ('product', 'batch_number', 'expiry_date', 'inward_qty', 'total', )
-
     def validate(self, attrs):
-        product = attrs.get('product')
-        batch = attrs.get('batch_number')
-
-        if FreshStockIn.objects.filter(product=product, batch_number=batch).exists():
-            raise serializers.ValidationError({'batch_number': 'This batch already exists for this product.'})
 
         if attrs.get('inward_qty', 0) < 0:
             raise serializers.ValidationError({'inward_qty': 'Must be non-negative.'})
@@ -34,7 +28,3 @@ class FreshStockInCreateSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class FreshStockInDeleteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FreshStockIn
-        fields = ('id', )
