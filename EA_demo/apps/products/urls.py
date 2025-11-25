@@ -20,8 +20,7 @@ urlpatterns = [
     path('create', ProductCreateView.as_view(), name='product-create'),
     path('<int:pk>', ProductDetailView.as_view(), name='product-detail'),
     path('<int:pk>/update', ProductUpdateView.as_view(), name='product-update'),
-    path('<int:pk>/Detail-update', ProductDetailView.as_view(), name='product-partial-update'),
-
+    
      # Fresh Stock-In
     path("fresh-stock", FreshStockInListView.as_view()),
     path("fresh-stock/create", FreshStockInCreateView.as_view()),
