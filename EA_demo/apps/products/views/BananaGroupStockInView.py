@@ -1,6 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-
+from rest_framework.generics import ListAPIView, CreateAPIView
 from apps.products.models import BananaGroupStockIn
 
 from apps.products.serializers.BananaGroupStockInSerializer import (
@@ -10,7 +10,7 @@ from apps.products.serializers.BananaGroupStockInSerializer import (
 
 
 
-class BananaGroupStockInListView(generics.GenericAPIView):
+class BananaGroupStockInListView(generics.ListAPIView):
     serializer_class = BananaGroupStockInListSerializer
 
     def get_queryset(self):
@@ -22,11 +22,11 @@ class BananaGroupStockInListView(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class BananaGroupStockInCreateView(generics.GenericAPIView):
+class BananaGroupStockInCreateView(generics.CreateAPIView):
     serializer_class = BananaGroupStockInCreateSerializer
     queryset = BananaGroupStockIn.objects.all()
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         if request.data.get("action") == "deactivate":
             stock_id = request.data.get("id")
             try:
@@ -36,12 +36,8 @@ class BananaGroupStockInCreateView(generics.GenericAPIView):
                 return Response({"message": "Stock deactivated successfully"}, status=200)
             except BananaGroupStockIn.DoesNotExist:
                 return Response({"error": "Stock not found"}, status=404)
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
+        return super().post(request, *args, **kwargs)
 
-        return Response(serializer.errors, status=400)
 
 
 

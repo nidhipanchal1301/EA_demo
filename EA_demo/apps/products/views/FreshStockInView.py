@@ -7,7 +7,7 @@ from apps.products.serializers.FreshStockInSerializer import FreshStockInCreateS
 
 
 
-class FreshStockInListView(generics.GenericAPIView):
+class FreshStockInListView(generics.ListAPIView):
     serializer_class = FreshStockInListSerializer
 
     def get_queryset(self):
@@ -19,11 +19,11 @@ class FreshStockInListView(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class FreshStockInCreateView(generics.GenericAPIView):
+class FreshStockInCreateView(generics.CreateAPIView):
     serializer_class = FreshStockInCreateSerializer
     queryset = FreshStockIn.objects.all()
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         action = request.data.get("action")
         if action == "deactivate":
             stock_id = request.data.get("id")
@@ -34,12 +34,9 @@ class FreshStockInCreateView(generics.GenericAPIView):
                 return Response({"message": "Stock deactivated"}, status=200)
             except FreshStockIn.DoesNotExist:
                 return Response({"error": "Not found"}, status=404)
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-
-        return Response(serializer.errors, status=400)
+        return super().post(request, *args, **kwargs)
+        
+  
 
 
 

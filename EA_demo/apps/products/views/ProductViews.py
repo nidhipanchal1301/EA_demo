@@ -18,12 +18,9 @@ class ProductListView(generics.ListAPIView):
     ).distinct()  
     serializer_class = ProductListSerializer
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ( 'product_sku_name', 'brand__name', 'category__name', 'product_group__name',
+    search_fields = ( 'name', 'brand__name', 'category__name', 'product_group__name',
         'product_variant__name', 'packaging__name', 'erp_item_code', )
-    ordering = ('-created_at',)
-
-    ordering_fields = ('created_at', 'product_sku_name')
-    # ordering = ('-created_at',)
+    ordering_fields = ('created_at', 'name',)
 
 
 class ProductDetailView(generics.RetrieveAPIView):
@@ -41,6 +38,5 @@ class ProductUpdateView(generics.UpdateAPIView):
     queryset = Product.objects.select_related('brand', 'category', 'product_group', 'product_variant', 'packaging')
     serializer_class = ProductUpdateSerializer
     lookup_field = 'pk'
-    # parser_classes = (MultiPartParser, FormParser, JSONParser)
 
 

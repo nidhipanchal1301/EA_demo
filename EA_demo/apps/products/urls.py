@@ -7,6 +7,7 @@ from apps.products.views.FreshStockInView import (
      FreshStockInCreateView, 
 )
 
+
 from apps.products.views.BananaGroupStockInView import (
     BananaGroupStockInListView,
     BananaGroupStockInCreateView,

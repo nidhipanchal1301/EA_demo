@@ -25,7 +25,7 @@ class ProductGroupSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ('id', 'name', 'product_group')
+        fields = ('id', 'name', 'product_group_variant')
 
 
 class PackagingSerializer(serializers.ModelSerializer):
@@ -44,7 +44,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'product_sku_name', 'product_customer_name', 'brand', 'category', 'product_group',\
+        fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
             'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
             'notes', 'upload_image', 'created_at', 'updated_at', )
         read_only_fields = ('id', 'created_at', 'updated_at')
@@ -54,26 +54,26 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            'product_sku_name', 'product_customer_name', 'brand', 'category',
+            'name', 'product_customer_name', 'brand', 'category',
             'product_group', 'product_variant', 'packaging', 'size', 'erp_item_code',
             'minimum_order', 'maximum_order', 'notes', 'upload_image', )
 
     def validate(self, attrs):
-        if Product.objects.filter(product_sku_name=attrs.get('product_sku_name')).exists():
-            raise serializers.ValidationError({'product_sku_name': 'SKU already exists.'})
+        if Product.objects.filter(name=attrs.get('name')).exists():
+            raise serializers.ValidationError({'name': 'SKU already exists.'})
         return attrs
 
 
 class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('product_sku_name', 'product_customer_name', 'brand', 'category', 'product_group', 'product_variant',\
+        fields = ('name', 'product_customer_name', 'brand', 'category', 'product_group', 'product_variant',\
             'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order', 'notes', 'upload_image',)
 
     def validate(self, attrs):
-        product_sku = attrs.get('product_sku_name') or getattr(self.instance, 'product_sku_name')
-        if Product.objects.filter(product_sku_name=product_sku).exclude(pk=self.instance.pk).exists():
-            raise serializers.ValidationError({'product_sku_name': 'Another product with this SKU exists.'})
+        product_sku = attrs.get('name') or getattr(self.instance, 'name')
+        if Product.objects.filter(name=product_sku).exclude(pk=self.instance.pk).exists():
+            raise serializers.ValidationError({'name': 'Another product with this SKU exists.'})
         return attrs
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -85,7 +85,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'product_sku_name', 'product_customer_name', 'brand', 'category', 'product_group',\
+        fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
             'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
             'notes', 'upload_image', 'created_at', 'updated_at', )
         read_only_fields = ('id', 'created_at', 'updated_at')
