@@ -1,8 +1,6 @@
 from django.db import models
 
-from django.core.validators import MinValueValidator
-
-
+from django.contrib.auth.models import User 
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -10,29 +8,10 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-created_at']
-
-
-class BaseStock(TimeStampedModel):
-    product = models.ForeignKey('Product', on_delete=models.PROTECT)
-    batch_number = models.CharField(max_length=120)
-
-    class Meta:
-        abstract = True
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.product.name} | {self.batch_number}"
-
 
 
 class Brand(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
-
-    class Meta:
-        verbose_name = "Brand"
-        verbose_name_plural = "Brands"
-        ordering = ("id",)
 
     def __str__(self):
         return self.name
@@ -40,11 +19,6 @@ class Brand(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
-
-    class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-        ordering = ("id",)
 
     def __str__(self):
         return self.name
@@ -55,21 +29,11 @@ class ProductGroup(models.Model):
 
     def __str__(self):
         return self.name
-    
-    class Meta:
-        verbose_name = "Product Group"
-        verbose_name_plural = "Product Groups"
-        ordering = ("id",)
 
 
 class ProductVariant(models.Model):
     name = models.CharField(max_length=100)
     product_group_variant = models.ForeignKey(ProductGroup, on_delete=models.CASCADE, related_name="variants")
-
-    class Meta:
-        verbose_name = "Product Variant"
-        verbose_name_plural = "Product Variants"
-        ordering = ("id",)
 
     def __str__(self):
         return self.name
@@ -78,11 +42,6 @@ class ProductVariant(models.Model):
 
 class Packaging(models.Model):
     name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "Packaging"
-        verbose_name_plural = "Packaging Types"
-        ordering = ("id",)
 
     def __str__(self):
         return self.name
@@ -103,28 +62,9 @@ class Product(TimeStampedModel):
     maximum_order = models.IntegerField(null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
     upload_image = models.ImageField(upload_to="products/", blank=True, null=True)
-    
-    class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
-        ordering = ("id",)
 
     def __str__(self):
         return self.name
-
-
-# FreshStockIn
-
-class FreshStockIn(BaseStock):
-    expiry_date = models.DateField(null=True, blank=True)
-    inward_qty = models.DecimalField(max_digits=12, decimal_places=3, null=True, blank=True, validators=[MinValueValidator(0)])
-    total = models.DecimalField(max_digits=14, decimal_places=3, null=True, blank=True,  validators=[MinValueValidator(0)])
-
-    class Meta:
-        verbose_name = "Fresh Stock-In" 
-        verbose_name_plural = "Fresh Stock-In"
-        unique_together = ('product', 'batch_number')
-
 
 
 #Container
@@ -132,30 +72,46 @@ class FreshStockIn(BaseStock):
 class Container(models.Model):
     name = models.CharField(max_length=150, unique=True)
 
-    class Meta:
-        verbose_name = "Container"
-        verbose_name_plural = "Containers"
-        ordering = ("id",)
+    def __str__(self):
+        return self.name
+
+
+class OO(models.Model): 
+    name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return self.name
 
 
-#Banana Group Stock-In
+class StockType(models.Model): 
+    name = models.CharField(max_length=100)
 
-class BananaGroupStockIn(BaseStock):
-    container = models.ForeignKey(Container, on_delete=models.PROTECT, related_name='group_stock_ins')
+    def __str__(self):
+        return self.name
+
+
+class StockIn(TimeStampedModel):
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    batch_number = models.CharField(max_length=120, null=True, blank=True)
+    expiry_date = models.DateField(null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='stockins')
+    inward_qty = models.IntegerField(null=True, blank=True)
+    stock_type = models.ForeignKey(StockType, on_delete=models.PROTECT, null=True, blank=True)
+    container = models.ForeignKey(Container, null=True, blank=True,on_delete=models.PROTECT)
     offload_in_days = models.PositiveIntegerField(null=True, blank=True)
-    quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(0)])
-    inward_quantity = models.DecimalField(max_digits=12, decimal_places=3, validators=[MinValueValidator(0)])
-    min_temperature = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    max_temperature = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    min_humidity = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
-    max_humidity = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    quantity = models.IntegerField(null=True, blank=True)
+    inward_quantity = models.IntegerField(null=True, blank=True)
+    min_temperature = models.FloatField(null=True, blank=True)
+    max_temperature = models.FloatField(null=True, blank=True)
+    min_humidity = models.FloatField(null=True, blank=True)
+    max_humidity = models.FloatField(null=True, blank=True)
 
-    class Meta:
-        verbose_name = "Banana Group Stock-In"
-        verbose_name_plural = "Banana Group Stock-In"
-        unique_together = ('product', 'batch_number')
+    def __str__(self):
+        return self.product.name
+
+
+
+   
+
 
    

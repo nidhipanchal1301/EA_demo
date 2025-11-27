@@ -36,18 +36,15 @@ class PackagingSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    brand = BrandSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
-    product_group = ProductGroupSerializer(read_only=True)
-    product_variant = ProductVariantSerializer(read_only=True)
-    packaging = PackagingSerializer(read_only=True)
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
             'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
             'notes', 'upload_image', 'created_at', 'updated_at', )
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
+            'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
+            'notes', 'upload_image', 'created_at', 'updated_at',)
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

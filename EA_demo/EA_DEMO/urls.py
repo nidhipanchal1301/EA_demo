@@ -30,11 +30,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/products/', include('apps.products.urls')),
-    # path('api/brands/', include('apps.products.urls')),
-    # path('api/categories/', include('apps.products.urls')),
-    # path('api/groups/', include('apps.products.urls')),
-    # path('api/variants/', include('apps.products.urls')),
-    # path('api/packaging/', include('apps.products.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
