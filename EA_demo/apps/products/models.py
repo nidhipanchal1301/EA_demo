@@ -91,7 +91,7 @@ class StockType(models.Model):
 
 
 class StockIn(TimeStampedModel):
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True, blank=True)
     batch_number = models.CharField(max_length=120, null=True, blank=True)
     expiry_date = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='stockins')

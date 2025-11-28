@@ -1,7 +1,9 @@
-from rest_framework import generics, filters
+from rest_framework import filters
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from apps.products.models import Product
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView
+
 
 from apps.products.serializers.ProductSerializer import (
     ProductListSerializer,
@@ -12,7 +14,7 @@ from apps.products.serializers.ProductSerializer import (
 
 
 
-class ProductListView(generics.ListAPIView):
+class ProductListView(ListAPIView):
     queryset = Product.objects.select_related(
         'brand', 'category', 'product_group', 'product_variant', 'packaging'
     ).distinct()  
@@ -23,18 +25,18 @@ class ProductListView(generics.ListAPIView):
     ordering_fields = ('created_at', 'name',)
 
 
-class ProductDetailView(generics.RetrieveAPIView):
+class ProductDetailView(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductDetailSerializer
     lookup_field = 'pk'
 
 
-class ProductCreateView(generics.CreateAPIView):
+class ProductCreateView(CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductCreateSerializer
 
 
-class ProductUpdateView(generics.UpdateAPIView):
+class ProductUpdateView(UpdateAPIView):
     queryset = Product.objects.select_related('brand', 'category', 'product_group', 'product_variant', 'packaging')
     serializer_class = ProductUpdateSerializer
     lookup_field = 'pk'

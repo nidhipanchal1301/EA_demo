@@ -1,4 +1,7 @@
-from rest_framework import generics, status
+from rest_framework import status
+
+from rest_framework.generics import ListAPIView, CreateAPIView
+
 
 from rest_framework.response import Response
 
@@ -8,11 +11,11 @@ from apps.products.serializers.StockInSerializer import StockInListSerializer, S
 
 
 
-class StockInListView(generics.ListAPIView):
+class StockInListView(ListAPIView):
     serializer_class = StockInListSerializer
 
     def get_queryset(self):
-        queryset = StockIn.objects.select_related('product', 'stock_type', 'created_by').all().order_by('-created_at')
+        queryset = StockIn.objects.select_related('product', 'stock_type', 'created_by').all()
         stock_type_id = self.request.query_params.get('stock_type')
         oo_id = self.request.query_params.get('oo')
 
@@ -25,7 +28,7 @@ class StockInListView(generics.ListAPIView):
 
 
 
-class StockInCreateView(generics.CreateAPIView):
+class StockInCreateView(CreateAPIView):
     serializer_class = StockInCreateSerializer
     queryset = StockIn.objects.all()
 

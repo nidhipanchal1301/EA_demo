@@ -1,33 +1,31 @@
 from rest_framework import serializers
+
 from apps.products.models import StockIn, Product, Container, StockType
 
-# List Serializer
+
+
 class StockInListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockIn
-        fields = (
-            'id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',
+        fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',"created_by",
             'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
             'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity',
-            'created_at'
-        )
-        read_only_fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',
+            'created_at', )
+        read_only_fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date', "created_by",
             'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
             'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity',
-            'created_at')
+            'created_at', )
 
 
-# Create Serializer
 class StockInCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockIn
         fields = (
-            'product', 'container', 'stock_type', 'batch_number', 'expiry_date',
+            'product', 'container', 'stock_type', 'batch_number', 'expiry_date', "created_by",
             'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
-            'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity'
-        )
+            'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity', )
 
     def validate(self, attrs):
         for field in ['inward_qty', 'quantity', 'inward_quantity']:

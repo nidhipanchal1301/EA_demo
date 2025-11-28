@@ -7,31 +7,31 @@ from apps.products.models import Product, Brand, Category, ProductGroup, Product
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ('id', 'name')
+        fields = ('id', 'name',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name')
+        fields = ('id', 'name',)
 
 
 class ProductGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductGroup
-        fields = ('id', 'name')
+        fields = ('id', 'name',)
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ('id', 'name', 'product_group_variant')
+        fields = ('id', 'name', 'product_group_variant',)
 
 
 class PackagingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Packaging
-        fields = ('id', 'name')
+        fields = ('id', 'name',)
 
 
 
@@ -85,6 +85,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
             'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
             'notes', 'upload_image', 'created_at', 'updated_at', )
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at',)
 
 
