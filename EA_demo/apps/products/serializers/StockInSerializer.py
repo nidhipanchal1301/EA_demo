@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.products.models import StockIn, Product, Container, StockType
+from apps.products.models import StockIn
 
 
 

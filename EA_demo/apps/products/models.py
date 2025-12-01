@@ -2,36 +2,36 @@ from django.db import models
 
 from django.contrib.auth.models import User 
 
-class TimeStampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+from .utils.BaseModel import TimeStampedModel
 
-    class Meta:
-        abstract = True
+from django.conf import settings
 
 
-class Brand(models.Model):
+
+
+
+class Brand(TimeStampedModel):
     name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-class Category(models.Model):
+class Category(TimeStampedModel):
     name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-class ProductGroup(models.Model):
+class ProductGroup(TimeStampedModel):
     name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
-class ProductVariant(models.Model):
+class ProductVariant(TimeStampedModel):
     name = models.CharField(max_length=100)
     product_group_variant = models.ForeignKey(ProductGroup, on_delete=models.CASCADE, related_name="variants")
 
@@ -40,7 +40,7 @@ class ProductVariant(models.Model):
 
 
 
-class Packaging(models.Model):
+class Packaging(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -69,35 +69,27 @@ class Product(TimeStampedModel):
 
 #Container
 
-class Container(models.Model):
+class Container(TimeStampedModel):
     name = models.CharField(max_length=150, unique=True)
 
     def __str__(self):
         return self.name
 
 
-class OO(models.Model): 
-    name = models.CharField(max_length=200, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class StockType(models.Model): 
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
 class StockIn(TimeStampedModel):
+    StockTypeChoices = (
+        ("fresh product", "fresh product"),
+        ("warehouse transfer", "warehouse transfer"),
+        ("unsold", "unsold"),
+    )
+
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True, blank=True)
     batch_number = models.CharField(max_length=120, null=True, blank=True)
+    stock_type = models.CharField(max_length=50, choices=StockTypeChoices, default="fresh_product")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="created_by_stockins")
     expiry_date = models.DateField(null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='stockins')
     inward_qty = models.IntegerField(null=True, blank=True)
-    stock_type = models.ForeignKey(StockType, on_delete=models.PROTECT, null=True, blank=True)
-    container = models.ForeignKey(Container, null=True, blank=True,on_delete=models.PROTECT)
+    container = models.ForeignKey(Container, null=True, blank=True,on_delete=models.PROTECT, related_name="container_stockins")
     offload_in_days = models.PositiveIntegerField(null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
     inward_quantity = models.IntegerField(null=True, blank=True)

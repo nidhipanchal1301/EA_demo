@@ -15,14 +15,14 @@ class StockInListView(ListAPIView):
     serializer_class = StockInListSerializer
 
     def get_queryset(self):
-        queryset = StockIn.objects.select_related('product', 'stock_type', 'created_by').all()
-        stock_type_id = self.request.query_params.get('stock_type')
-        oo_id = self.request.query_params.get('oo')
+        queryset = StockIn.objects.select_related('product', 'created_by').all()
+        stock_type = self.request.query_params.get('stock_type')
+        created_by_user_id = self.request.query_params.get('created_by')
 
-        if stock_type_id:
-            queryset = queryset.filter(stock_type_id=stock_type_id)
-        if oo_id:
-            queryset = queryset.filter(created_by_id=oo_id)
+        if stock_type:
+            queryset = queryset.filter(stock_type_id=stock_type)
+        if created_by_user_id:
+            queryset = queryset.filter(created_by_id=created_by_user_id)
 
         return queryset
 
@@ -38,12 +38,6 @@ class StockInCreateView(CreateAPIView):
 
         for row in rows:
             if "delete" in row:
-                delete_id = row["delete"]
-                try:
-                    StockIn.objects.get(id=delete_id).delete()
-                    responses.append({"action": "deleted", "id": delete_id})
-                except StockIn.DoesNotExist:
-                    responses.append({"action": "delete_failed", "id": delete_id})
                 continue
             if "create" in row:
                 serializer = self.serializer_class(data=row["create"])
