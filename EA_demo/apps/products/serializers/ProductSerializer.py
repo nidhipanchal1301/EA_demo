@@ -7,7 +7,7 @@ from apps.products.models import Product, Brand, Category, ProductGroup, Product
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ('id', 'name',)
+        fields = ('id', 'name',)    
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -36,22 +36,25 @@ class PackagingSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    brand_name = serializers.CharField(source='brand_name.name', read_only=True)
+    category_name = serializers.CharField(source='category_name.name', read_only=True)
+    product_group = serializers.CharField(source='product_group.name', read_only=True)
+    product_variant = serializers.CharField(source='product_variant.name', read_only=True)
+    packaging = serializers.CharField(source='Packaging.name', read_only=True)
 
+    
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
-            'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
-            'notes', 'upload_image', 'created_at', 'updated_at', )
-        read_only_fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
-            'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
-            'notes', 'upload_image', 'created_at', 'updated_at',)
+        fields = ('id', 'name', 'brand_name', 'category_name', 'product_group','product_variant',\
+                'size', 'packaging', 'erp_item_code', )
+        read_only_fields = fields
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            'name', 'product_customer_name', 'brand', 'category',
+            'name', 'product_customer_name', 'brand_name', 'category_name',
             'product_group', 'product_variant', 'packaging', 'size', 'erp_item_code',
             'minimum_order', 'maximum_order', 'notes', 'upload_image', )
 
@@ -64,7 +67,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
 class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('name', 'product_customer_name', 'brand', 'category', 'product_group', 'product_variant',\
+        fields = ('name', 'product_customer_name', 'brand_name', 'category_name', 'product_group', 'product_variant',\
             'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order', 'notes', 'upload_image',)
 
     def validate(self, attrs):
@@ -75,14 +78,14 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
+    category_name = CategorySerializer(read_only=True)
     product_group = ProductGroupSerializer(read_only=True)
     product_variant = ProductVariantSerializer(read_only=True)
     packaging = PackagingSerializer(read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_customer_name', 'brand', 'category', 'product_group',\
+        fields = ('id', 'name', 'product_customer_name', 'brand_name', 'category_name', 'product_group',\
             'product_variant', 'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order',\
             'notes', 'upload_image', 'created_at', 'updated_at', )
         read_only_fields = ('id', 'created_at', 'updated_at',)

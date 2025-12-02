@@ -16,7 +16,7 @@ from apps.products.serializers.ProductSerializer import (
 
 class ProductListView(ListAPIView):
     queryset = Product.objects.select_related(
-        'brand', 'category', 'product_group', 'product_variant', 'packaging'
+        'brand_name', 'category_name', 'product_group', 'product_variant', 'packaging'
     ).distinct()  
     serializer_class = ProductListSerializer
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
@@ -37,7 +37,7 @@ class ProductCreateView(CreateAPIView):
 
 
 class ProductUpdateView(UpdateAPIView):
-    queryset = Product.objects.select_related('brand', 'category', 'product_group', 'product_variant', 'packaging')
+    queryset = Product.objects.select_related('brand_name', 'category_name', 'product_group', 'product_variant', 'packaging')
     serializer_class = ProductUpdateSerializer
     lookup_field = 'pk'
 

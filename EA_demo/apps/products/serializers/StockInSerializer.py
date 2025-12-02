@@ -5,21 +5,16 @@ from apps.products.models import StockIn
 
 
 class StockInListSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(source='product.name', read_only=True)
+    container = serializers.CharField(source='container.name', read_only=True)
 
     class Meta:
         model = StockIn
-        fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',"created_by",
-            'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
-            'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity',
-            'created_at', )
-        read_only_fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date', "created_by",
-            'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
-            'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity',
-            'created_at', )
+        fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',"created_by", 'quantity', )
+        read_only_fields = fields
 
 
 class StockInCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = StockIn
         fields = (
