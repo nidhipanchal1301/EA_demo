@@ -4,45 +4,13 @@ from apps.products.models import Product, Brand, Category, ProductGroup, Product
 
 
 
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = ('id', 'name',)    
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ('id', 'name',)
-
-
-class ProductGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductGroup
-        fields = ('id', 'name',)
-
-
-class ProductVariantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariant
-        fields = ('id', 'name', 'product_group_variant',)
-
-
-class PackagingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Packaging
-        fields = ('id', 'name',)
-
-
-
 class ProductListSerializer(serializers.ModelSerializer):
-    brand_name = serializers.CharField(source='brand_name.name', read_only=True)
-    category_name = serializers.CharField(source='category_name.name', read_only=True)
-    product_group = serializers.CharField(source='product_group.name', read_only=True)
-    product_variant = serializers.CharField(source='product_variant.name', read_only=True)
-    packaging = serializers.CharField(source='Packaging.name', read_only=True)
+    brand_name = serializers.CharField(source='brand_name.name',  allow_null=True)
+    category_name = serializers.CharField(source='category_name.name',  allow_null=True)
+    product_group = serializers.CharField(source='product_group.name',  allow_null=True)
+    product_variant = serializers.CharField(source='product_variant.name',  allow_null=True)
+    packaging = serializers.CharField(source='packaging.name',  allow_null=True)
 
-    
     class Meta:
         model = Product
         fields = ('id', 'name', 'brand_name', 'category_name', 'product_group','product_variant',\
@@ -68,20 +36,21 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('name', 'product_customer_name', 'brand_name', 'category_name', 'product_group', 'product_variant',\
-            'packaging', 'size', 'erp_item_code', 'minimum_order', 'maximum_order', 'notes', 'upload_image',)
+            'size', 'erp_item_code', 'minimum_order', 'maximum_order', 'notes', 'upload_image',)
 
     def validate(self, attrs):
         product_sku = attrs.get('name') or getattr(self.instance, 'name')
         if Product.objects.filter(name=product_sku).exclude(pk=self.instance.pk).exists():
             raise serializers.ValidationError({'name': 'Another product with this SKU exists.'})
         return attrs
+    
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-    brand = BrandSerializer(read_only=True)
-    category_name = CategorySerializer(read_only=True)
-    product_group = ProductGroupSerializer(read_only=True)
-    product_variant = ProductVariantSerializer(read_only=True)
-    packaging = PackagingSerializer(read_only=True)
+    brand_name = serializers.CharField(source='brand_name.name', read_only=True)
+    category_name = serializers.CharField(source='category_name.name', read_only=True)
+    product_group = serializers.CharField(source='product_group_name.name', read_only=True)
+    product_variant = serializers.CharField(source='product_variant_name.name', read_only=True)
+    packaging = serializers.CharField(source='packaging.name', read_only=True)
 
     class Meta:
         model = Product

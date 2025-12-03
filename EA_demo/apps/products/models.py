@@ -15,7 +15,7 @@ class Brand(TimeStampedModel):
         return self.name
     
     class Meta:
-        db_table = "brand_name"
+        db_table = "brand_name" 
 
 
 

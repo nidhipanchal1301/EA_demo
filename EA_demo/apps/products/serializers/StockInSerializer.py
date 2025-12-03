@@ -5,12 +5,13 @@ from apps.products.models import StockIn
 
 
 class StockInListSerializer(serializers.ModelSerializer):
+    created_by = serializers.CharField(source='created_by.__str__', read_only=True)
     product = serializers.CharField(source='product.name', read_only=True)
     container = serializers.CharField(source='container.name', read_only=True)
 
     class Meta:
         model = StockIn
-        fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',"created_by", 'quantity', )
+        fields = ('id', 'product', 'container', 'stock_type', 'batch_number', 'expiry_date',"created_by", 'quantity','created_at', )
         read_only_fields = fields
 
 
@@ -27,15 +28,3 @@ class StockInCreateSerializer(serializers.ModelSerializer):
             if attrs.get(field, 0) < 0:
                 raise serializers.ValidationError({field: "Must be non-negative."})
         return attrs
-
-    def create(self, validated_data):
-        obj, created = StockIn.objects.get_or_create(
-            product=validated_data['product'],
-            batch_number=validated_data.get('batch_number'),
-            stock_type=validated_data.get('stock_type'),
-            container=validated_data.get('container'),
-            defaults=validated_data
-        )
-        if not created:
-            raise serializers.ValidationError("Duplicate entry found.")
-        return obj

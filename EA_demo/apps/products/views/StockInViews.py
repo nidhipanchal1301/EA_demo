@@ -40,9 +40,22 @@ class StockInCreateView(CreateAPIView):
             if "delete" in row:
                 continue
             if "create" in row:
-                serializer = self.serializer_class(data=row["create"])
+                data = row["create"]
+                serializer = self.serializer_class(data=data)
                 serializer.is_valid(raise_exception=True)
-                serializer.save()
-                responses.append({"action": "created", "data": serializer.data})
+                product = serializer.validated_data('product')
+                batch = serializer.validated_data.get('batch_number')
+                stock_type = serializer.validated_data.get('stock_type')
+                container = serializer.validated_data.get('container')
+                exists = StockIn.objects.filter(product=product, batch_number=batch, stock_type=stock_type, container=container).exists()
+                if exists:
+                    responses.append({
+                        "action": "duplicate",
+                        "message": "Duplicate StockIn entry found.",
+                        "sku": product.name
+                    })
+                    continue
+                stock_in = StockIn.objects.create(**serializer.validated_data)
+                responses.append({"action": "created", "data": StockInListSerializer(stock_in).data})
         return Response(responses, status=status.HTTP_200_OK)
 
