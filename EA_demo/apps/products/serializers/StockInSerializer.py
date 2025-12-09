@@ -19,7 +19,7 @@ class StockInCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = StockIn
         fields = (
-            'product', 'container', 'stock_type', 'batch_number', 'expiry_date', "created_by",
+            'product', 'container', 'stock_type', 'batch_number', 'expiry_date',
             'inward_qty', 'quantity', 'inward_quantity', 'offload_in_days',
             'min_temperature', 'max_temperature', 'min_humidity', 'max_humidity', )
 

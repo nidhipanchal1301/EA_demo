@@ -22,7 +22,7 @@ from apps.products.serializers.ProductSerializer import (
 class ProductListView(ListAPIView):
     queryset = Product.objects.select_related(
         'brand_name', 'category_name', 'product_group', 'product_variant', 'packaging'
-    ).distinct()  
+    ).distinct().order_by('id')
     serializer_class = ProductListSerializer
     filter_backends = (DjangoFilterBackend,filters.SearchFilter, )
     filterset_class = ProductFilter
