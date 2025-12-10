@@ -29,18 +29,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/products/', include('products.urls')),
-    path('api/brands/', include('products.urls')),
-    path('api/categories/', include('products.urls')),
-    path('api/groups/', include('products.urls')),
-    path('api/variants/', include('products.urls')),
-    path('api/packaging/', include('products.urls')),
+    path('api/products/', include('apps.products.urls')),
+    # path('api/products/stock-in/', include('apps.products.urls')),
+    
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar
