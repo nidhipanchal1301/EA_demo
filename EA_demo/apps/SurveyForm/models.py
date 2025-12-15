@@ -1,0 +1,71 @@
+from django.db import models
+
+from django.contrib.auth.models import User
+
+from .utils.BaseModel import TimeStampedModel
+
+
+
+class SurveyPermission(models.Model):
+    key = models.CharField(max_length=50,  unique=True)
+    label = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        db_table = "survey_permission"
+
+
+class SurveyForm(TimeStampedModel):
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", "Active"
+        INACTIVE = "inactive", "Inactive"
+
+    name = models.CharField(max_length=255, null=True, blank=True)
+    permissions = models.ManyToManyField(SurveyPermission, related_name="survey_forms")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+
+    def __str__(self):      
+        return self.name
+    
+    class Meta:
+        db_table = "SurveyForm"
+
+
+class SurveyQuestion(TimeStampedModel):
+
+    class QuestionTypes(models.TextChoices):
+        SHORT_TEXT ="short_text", "Short Text"
+        LONG_TEXT = "long_text", "Long Text"
+        DATE = "date", "Date"
+        NUMBER = "number", "Number"
+        MOBILE_NUMBER = "mobile_number", "Mobile Number"
+        SINGLE_CHOICE = "single_choice", "Single Choice"
+        MULTI_CHOICE = "multi_choice", "Multiple Choice"
+
+    form = models.ForeignKey(SurveyForm, related_name="questions_form", on_delete=models.CASCADE)
+    label = models.CharField(max_length=255, null=True, blank=True)
+    placeholder = models.CharField(max_length=255, null=True, blank=True)
+    type = models.CharField(max_length=20, choices=QuestionTypes.choices)
+    mandatory = models.BooleanField(default=False)
+    default_hide = models.BooleanField(default=False)
+    use_for_analytics = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.label} ({self.form.name})"
+    
+    class Meta:
+        db_table = "SurveyQuestion"
+
+
+class SurveyOption(TimeStampedModel):
+    question = models.ForeignKey(SurveyQuestion, related_name="options_question", on_delete=models.CASCADE)
+    text = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.text
+    
+    class Meta:
+        db_table = "SurveyOption"
