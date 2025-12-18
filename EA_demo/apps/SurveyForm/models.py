@@ -6,15 +6,22 @@ from .utils.BaseModel import TimeStampedModel
 
 
 
+class SurveyPermissionChoices(models.TextChoices):
+    CUSTOMER = "customer", "Customer"
+    TELE_SALES = "tele_sales", "Tele Sales"
+    TRADE_DEVELOPER = "trade_developer", "Trade Developer"
+
+
 class SurveyPermission(models.Model):
-    key = models.CharField(max_length=50,  unique=True)
-    label = models.CharField(max_length=255, null=True, blank=True)
+    key = models.CharField(max_length=50, choices=SurveyPermissionChoices.choices, blank=True)
+    label = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.label
 
     class Meta:
-        db_table = "survey_permission"
+        db_table = "survey_permissions"
+
 
 
 class SurveyForm(TimeStampedModel):
@@ -24,14 +31,14 @@ class SurveyForm(TimeStampedModel):
         INACTIVE = "inactive", "Inactive"
 
     name = models.CharField(max_length=255, null=True, blank=True)
-    permissions = models.ManyToManyField(SurveyPermission, related_name="survey_forms")
+    permissions = models.ManyToManyField(SurveyPermission, related_name="SurveyForm_permissions", blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
 
     def __str__(self):      
         return self.name
     
     class Meta:
-        db_table = "SurveyForm"
+        db_table = "survey_forms"
 
 
 class SurveyQuestion(TimeStampedModel):
@@ -45,7 +52,7 @@ class SurveyQuestion(TimeStampedModel):
         SINGLE_CHOICE = "single_choice", "Single Choice"
         MULTI_CHOICE = "multi_choice", "Multiple Choice"
 
-    form = models.ForeignKey(SurveyForm, related_name="questions_form", on_delete=models.CASCADE)
+    form = models.ForeignKey(SurveyForm, related_name="SurveyQuestion_form", on_delete=models.CASCADE)
     label = models.CharField(max_length=255, null=True, blank=True)
     placeholder = models.CharField(max_length=255, null=True, blank=True)
     type = models.CharField(max_length=20, choices=QuestionTypes.choices)
@@ -57,15 +64,15 @@ class SurveyQuestion(TimeStampedModel):
         return f"{self.label} ({self.form.name})"
     
     class Meta:
-        db_table = "SurveyQuestion"
+        db_table = "survey_questions"
 
 
 class SurveyOption(TimeStampedModel):
-    question = models.ForeignKey(SurveyQuestion, related_name="options_question", on_delete=models.CASCADE)
+    question = models.ForeignKey(SurveyQuestion, related_name="SurveyOption_question", on_delete=models.CASCADE)
     text = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.text
     
     class Meta:
-        db_table = "SurveyOption"
+        db_table = "survey_options"
