@@ -4,16 +4,24 @@ from ..models import SurveyForm, SurveyQuestion, SurveyOption, SurveyPermission
 
 
 
-class PermissionSerializer(serializers.ModelSerializer):
+class SurveyPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyPermission
-        fields = ("id", "key", "label",)
+        fields = ("id", "key",)
+        
 
 class SurveyOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyOption
         fields = ("text",)
 
+
+class SurveyQuestionSerializer(serializers.ModelSerializer):
+    options = SurveyOptionSerializer(many=True, source="SurveyOption_question")
+
+    class Meta:
+        model = SurveyQuestion
+        fields = (  "label", "type", "options",)
 
 
 class SurveyOptionListSerializer(serializers.ModelSerializer):
@@ -31,14 +39,13 @@ class SurveyQuestionListSerializer(serializers.ModelSerializer):
 
 
 class SurveyFormListSerializer(serializers.ModelSerializer):
-    permissions = serializers.SerializerMethodField()
-    total_questions = serializers.SerializerMethodField()
-    questions = SurveyQuestionListSerializer(many=True, source="SurveyQuestion_form")
+    permissions = serializers.SlugRelatedField(many=True, read_only=True, slug_field="key")  
+    questions = SurveyQuestionSerializer(many=True, source="SurveyQuestion_form")
+    total_questions = serializers.IntegerField(source="SurveyQuestion_form.count", read_only=True)
 
     class Meta:
         model = SurveyForm
-        fields = ("id", "name", "status", "created_at", "permissions", "questions", "total_questions", )
-
+        fields = ("id", "name", "permissions", "status", "total_questions", "questions",)
 
 
 class SurveyFormCreateSerializer(serializers.Serializer):
@@ -49,23 +56,130 @@ class SurveyFormCreateSerializer(serializers.Serializer):
 
     
     def validate_permissions(self, value):
+        if SurveyPermission.objects.filter(id__in=value).count() != len(value):
+            raise serializers.ValidationError("Some permissions are invalid")
+        return value
+
+    def validate_questions(self, value):
+        for index, q in enumerate(value, start=1):
+            for field in ["label", "type", "options"]:
+                if field not in q:
+                    raise serializers.ValidationError(
+                        f"Question {index}: '{field}' is required"
+                    )
+
+            options = q["options"]
+            if not isinstance(options, list) or not options:
+                raise serializers.ValidationError(
+                    f"Question {index}: options must be a non-empty list"
+                )
+
+            for opt in options:
+                if isinstance(opt, dict):
+                    if "text" not in opt or not opt["text"]:
+                        raise serializers.ValidationError(
+                            f"Question {index}: option must contain 'text'"
+                        )
+                elif not isinstance(opt, str):
+                    raise serializers.ValidationError(
+                        f"Question {index}: option must be string or object"
+                    )
+
+            if "mandatory" in q and not isinstance(q["mandatory"], bool):
+                raise serializers.ValidationError(
+                    f"Question {index}: mandatory must be boolean"
+                )
+
+            if "placeholder" in q and not isinstance(q["placeholder"], str):
+                raise serializers.ValidationError(
+                    f"Question {index}: placeholder must be string"
+                )
+
+        return value
+    
+
+class SurveyFormResponseSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+    total_questions = serializers.SerializerMethodField()
+    questions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SurveyForm
+        fields = ("id", "name", "permissions", "status", "total_questions", "questions",)
+
+    def get_permissions(self, obj):
+        return [p.key for p in obj.permissions.all()]
+
+    def get_total_questions(self, obj):
+        return obj.SurveyQuestion_form.count()
+
+    def get_questions(self, obj):
+        return [
+            {
+                "question": q.label,
+                "type": q.type,
+                "values": [opt.text for opt in q.SurveyOption_question.all()]
+            }
+            for q in obj.SurveyQuestion_form.all()
+        ]
+
+
+class SurveyFormUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False)
+    status = serializers.ChoiceField(choices=[("active", "Active"), ("inactive", "Inactive")],  required=False)
+    permissions = serializers.ListField(child=serializers.IntegerField(), required=False)
+    questions = serializers.ListField(child=serializers.DictField(), required=False)
+
+    def validate_permissions(self, value):
         if not all(SurveyPermission.objects.filter(id=perm_id).exists() for perm_id in value):
             raise serializers.ValidationError("Some permissions are invalid")
         return value
 
     def validate_questions(self, value):
-        for q in value:
-            required_fields = ["label", "type", "options"]
-            for field in required_fields:
+        for index, q in enumerate(value, start=1):
+            for field in ["label", "type", "options"]:
                 if field not in q:
-                    raise serializers.ValidationError(f"Each question must have '{field}'")
-            if not isinstance(q["options"], list) or len(q["options"]) == 0:
-                raise serializers.ValidationError("Each question must have at least one option")
+                    raise serializers.ValidationError(f"Question {index}: '{field}' is required")
+
+            options = q["options"]
+            if not isinstance(options, list) or not options:
+                raise serializers.ValidationError(f"Question {index}: options must be a non-empty list")
+
+            for opt in options:
+                if isinstance(opt, dict):
+                    if "text" not in opt or not opt["text"]:
+                        raise serializers.ValidationError(f"Question {index}: option must contain 'text'")
+                elif not isinstance(opt, str):
+                    raise serializers.ValidationError(f"Question {index}: option must be string or object")
+
+            if "mandatory" in q and not isinstance(q["mandatory"], bool):
+                raise serializers.ValidationError(f"Question {index}: mandatory must be boolean")
+            if "placeholder" in q and not isinstance(q["placeholder"], str):
+                raise serializers.ValidationError(f"Question {index}: placeholder must be string")
         return value
+    
 
+class SurveyFormDetailSerializer(serializers.ModelSerializer):
+    permissions = serializers.SerializerMethodField()
+    total_questions = serializers.SerializerMethodField()
+    questions = serializers.SerializerMethodField()
 
-class SurveyFormUpdateSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False)
-    status = serializers.CharField(required=False)
-    permissions = serializers.ListField(child=serializers.IntegerField(), required=False)
-    questions = serializers.ListField(required=False)
+    class Meta:
+        model = SurveyForm
+        fields = ("id", "name", "permissions", "status", "total_questions", "questions",)
+
+    def get_permissions(self, obj):
+        return [p.key for p in obj.permissions.all()]
+
+    def get_total_questions(self, obj):
+        return obj.SurveyQuestion_form.count()
+
+    def get_questions(self, obj):
+        return [
+            {
+                "question": q.label,
+                "type": q.type,
+                "values": [opt.text for opt in q.SurveyOption_question.all()]
+            }
+            for q in obj.SurveyQuestion_form.all()
+        ]

@@ -13,11 +13,10 @@ class SurveyPermissionChoices(models.TextChoices):
 
 
 class SurveyPermission(models.Model):
-    key = models.CharField(max_length=50, choices=SurveyPermissionChoices.choices, blank=True)
-    label = models.CharField(max_length=100, null=True, blank=True)
+    key = models.CharField(max_length=50, choices=SurveyPermissionChoices.choices)
 
     def __str__(self):
-        return self.label
+        return self.key
 
     class Meta:
         db_table = "survey_permissions"
