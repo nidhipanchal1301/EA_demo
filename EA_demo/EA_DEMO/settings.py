@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'products',
+    'apps.products',
+    'apps.users',
+    'apps.SurveyForm',
     'debug_toolbar',
-
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +61,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-ROOT_URLCONF = 'EA_demo.urls'
+ROOT_URLCONF = 'EA_DEMO.urls'
 
 TEMPLATES = [
     {
@@ -71,28 +78,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'EA_demo.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+WSGI_APPLICATION = 'EA_DEMO.wsgi.application'
 
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ea_demo',      
-        'USER': 'NidhiPanchal',              
-        'PASSWORD': '123',  
-        'HOST': 'localhost',
-        'PORT': '5432',            
+        'NAME': os.getenv("DB_NAME"),      
+        'USER': os.getenv("DB_USER"),             
+        'PASSWORD': os.getenv("DB_PASSWORD"),  
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),            
     }
 }
 
@@ -127,6 +123,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
+APPEND_SLASH = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -145,25 +144,32 @@ MEDIA_ROOT = BASE_DIR / 'media'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+     "DEFAULT_PARSER_CLASSES": (
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ),
 
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser',
-    ]
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
 }
 
 INTERNAL_IPS = [
     "127.0.0.1", 
 ]
-
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.timer.TimerPanel',
